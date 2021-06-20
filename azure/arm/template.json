@@ -13,12 +13,12 @@
     "variables": {},
     "resources": [
         {
-            "name": "[toLower('manjul-vm1storage')]",
+            "name": "[toLower('manjulvm1storage')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "location": "[resourceGroup().location]",
             "tags": {
-                "displayName": "manjul-vm1 Storage Account"
+                "displayName": "manjulvm1 Storage Account"
             },
             "sku": {
                 "name": "Standard_LRS"
@@ -26,7 +26,7 @@
             "kind": "Storage"
         },
         {
-            "name": "manjul-vm1-PublicIP",
+            "name": "manjulvm1-PublicIP",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-11-01",
             "location": "[resourceGroup().location]",
@@ -36,12 +36,12 @@
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
-                    "domainNameLabel": "[toLower('manjul-vm1')]"
+                    "domainNameLabel": "[toLower('manjulvm1')]"
                 }
             }
         },
         {
-            "name": "manjul-vm1-nsg",
+            "name": "manjulvm1-nsg",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2018-08-01",
             "location": "[resourceGroup().location]",
@@ -65,15 +65,15 @@
             }
         },
         {
-            "name": "manjul-vm1-VirtualNetwork",
+            "name": "manjulvm1-VirtualNetwork",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2019-11-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', 'manjul-vm1-nsg')]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'manjulvm1-nsg')]"
             ],
             "tags": {
-                "displayName": "manjul-vm1-VirtualNetwork"
+                "displayName": "manjulvm1-VirtualNetwork"
             },
             "properties": {
                 "addressSpace": {
@@ -83,11 +83,11 @@
                 },
                 "subnets": [
                     {
-                        "name": "manjul-vm1-VirtualNetwork-Subnet",
+                        "name": "manjulvm1-VirtualNetwork-Subnet",
                         "properties": {
                             "addressPrefix": "10.0.0.0/24",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'manjul-vm1-nsg')]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'manjulvm1-nsg')]"
                             }
                         }
                     }
@@ -95,16 +95,16 @@
             }
         },
         {
-            "name": "manjul-vm1-NetworkInterface",
+            "name": "manjulvm1-NetworkInterface",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-11-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses', 'manjul-vm1-PublicIP')]",
-                "[resourceId('Microsoft.Network/virtualNetworks', 'manjul-vm1-VirtualNetwork')]"
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'manjulvm1-PublicIP')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', 'manjulvm1-VirtualNetwork')]"
             ],
             "tags": {
-                "displayName": "manjul-vm1-NetworkInterface"
+                "displayName": "manjulvm1-NetworkInterface"
             },
             "properties": {
                 "ipConfigurations": [
@@ -113,10 +113,10 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'manjul-vm1-PublicIP')]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'manjulvm1-PublicIP')]"
                             },
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'manjul-vm1-VirtualNetwork', 'manjul-vm1-VirtualNetwork-Subnet')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'manjulvm1-VirtualNetwork', 'manjulvm1-VirtualNetwork-Subnet')]"
                             }
                         }
                     }
@@ -124,22 +124,22 @@
             }
         },
         {
-            "name": "manjul-vm1",
+            "name": "manjulvm1",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', 'manjul-vm1-NetworkInterface')]"
+                "[resourceId('Microsoft.Network/networkInterfaces', 'manjulvm1-NetworkInterface')]"
             ],
             "tags": {
-                "displayName": "manjul-vm1"
+                "displayName": "manjulvm1"
             },
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "Standard_A2_v2"
                 },
                 "osProfile": {
-                    "computerName": "manjul-vm1",
+                    "computerName": "manjulvm1",
                     "adminUsername": "adminUsername",
                     "adminPassword": "[parameters('adminpassword')]"
                 },
@@ -151,7 +151,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "name": "manjul-vm1-OSDisk",
+                        "name": "manjulvm1-OSDisk",
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
                     }
@@ -159,14 +159,14 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'manjul-vm1-NetworkInterface')]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'manjulvm1-NetworkInterface')]"
                         }
                     ]
                 },
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', toLower('manjul-vm1storage'))).primaryEndpoints.blob]"
+                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', toLower('manjulvm1storage'))).primaryEndpoints.blob]"
                     }
                 }
             }
@@ -175,7 +175,7 @@
     "outputs": {
         "publicIP": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses','manjul-vm1-PublicIP')).dnsSettings.fqdns]"
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses','manjulvm1-PublicIP')).dnsSettings.fqdns]"
         }
     }
 }
